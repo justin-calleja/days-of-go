@@ -8,15 +8,15 @@ import (
 	"strings"
 )
 
-type handler struct{}
+type Handler struct{}
 
-type response struct {
+type Response struct {
 	PathParams  []string   `json:"pathParams"`
 	QueryParams url.Values `json:"queryParams"`
 }
 
-func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	resp := response{PathParams: []string{}, QueryParams: make(url.Values)}
+func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	resp := Response{PathParams: []string{}, QueryParams: make(url.Values)}
 
 	path := strings.TrimPrefix(r.URL.Path, "/echo-params")
 
@@ -36,7 +36,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	fooHandler := handler{}
+	fooHandler := Handler{}
 	http.Handle("/echo-params", &fooHandler)
 	http.Handle("/echo-params/", &fooHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
