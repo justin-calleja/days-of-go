@@ -17,7 +17,6 @@ type response struct {
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	resp := response{PathParams: []string{}, QueryParams: make(url.Values)}
-
 	path := strings.TrimPrefix(r.URL.Path, "/echo-params")
 
 	if path != "" && path != "/" {
@@ -27,8 +26,6 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		splitPath := strings.FieldsFunc(path, f)
 		resp.PathParams = append(resp.PathParams, splitPath...)
 	}
-
-	resp.QueryParams = r.URL.Query()
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

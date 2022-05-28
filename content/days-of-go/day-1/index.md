@@ -6,7 +6,6 @@ toc: true
 
 ## Goals
 
-- This is just for practice!
 - http server serving on port `8080` with one route registered: `GET /echo-params`
 - Any paths after `/echo-params` should be considered as `pathParams`.
 - Response should be a JSON object with `pathParams` and `queryParams` properties, as per:
@@ -27,7 +26,7 @@ toc: true
   }
   ```
 
-## Walkthrough
+## Walk-through
 
 Put part of the provided example in the beginning section of go's [http](https://pkg.go.dev/net/http#Handler) docs:
 
@@ -37,7 +36,7 @@ http.Handle("/echo-params", fooHandler)
 log.Fatal(http.ListenAndServe(":8080", nil))
 ```
 
-… in a `main` function and add the missing `fooHandler` function which… at first I thought should take as args the same args which the anon function passed to `HandleFunc` is taking in the example i.e. a `ResponseWriter` and a reference to a `Request` - but on further investigation - it takes a `struct` which implements `ServeHTTP` which is a function that takes the aforementioned types as args:
+… in a `main` function and add the missing `fooHandler` function which seems to need to be a `struct` that implements `ServeHTTP`:
 
 ```go
 type Handler interface {
@@ -54,12 +53,18 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     log.Println("hello")
 }
 
+// ...
 // in main:
-    fooHandler := handler{}
-    http.Handle("/echo-params", &fooHandler)
+fooHandler := handler{}
+http.Handle("/echo-params", &fooHandler)
 ```
 
-At this point, running the server with `go run main.go`, and hitting it with `curl http://localhost:8080/echo-params`, logs out `"hello"` preceded by the date / time.
+### Checkpoint 1
+
+{{< code language="go" title="Checkpoint 1" id="code-checkpoint-1" expand="Show" collapse="Hide"isCollapsed="true" >}}
+{{% include "/days-of-go/day-1/checkpoint-1/main.go" %}}{{< /code >}}
+
+At this point, running the server with `go run checkpoint-1/main.go`, and hitting it with `curl http://localhost:8080/echo-params`, logs out `"hello"` preceded by the date / time.
 
 Now I need to get access to path / query params. According to [this SO answer](https://stackoverflow.com/a/34315203/990159), I can use `r.URL.Path` to get access to the full path, and `strings.TrimPrefix` to remove the path the route is hosted on. I also added the same handler on both of these:
 
@@ -95,6 +100,11 @@ curl http://localhost:8080/echo-params/hello/world
 /echo-params/hello/world /hello/world
 ```
 
+### Checkpoint 2
+
+{{< code language="go" title="Checkpoint 2" id="code-checkpoint-2" expand="Show" collapse="Hide" isCollapsed="true" >}}
+{{% include "/days-of-go/day-1/checkpoint-2/main.go" %}}{{< /code >}}
+
 At this point, I tried using: `strings.Split(path, "/")`, but that was giving me an initial empty string e.g. `["","hello","world"]` because of the first `/` in the path. So I ended up going with `func FieldsFunc(s string, f func(rune) bool) []string ` instead. The function `f` takes a `rune`, which is just and `int32`:
 
 ```go
@@ -113,10 +123,75 @@ f := func(c rune) bool {
 splitPath := strings.FieldsFunc(path, f)
 ```
 
-s := strings.Split("a,b,c", ",")
+### Checkpoint 3
 
-    query := r.URL.Query()
-    jsonByte, _ := json.Marshal(query)
-    jsonString := string(jsonByte)
+You can run this new addition by running checkpoint 3:
 
-    log.Println(r.URL.Path, query, jsonString)
+{{< code language="go" title="Checkpoint 3" id="code-checkpoint-3" expand="Show" collapse="Hide" isCollapsed="true" >}}
+{{% include "/days-of-go/day-1/checkpoint-3/main.go" %}}{{< /code >}}
+
+Moving on. The response `struct` should look like this:
+
+```go
+type response struct {
+	PathParams  []string   `json:"pathParams"`
+	QueryParams url.Values `json:"queryParams"`
+}
+```
+
+Which should probably be created at the top of the handler with:
+
+```go
+resp := response{PathParams: []string{}, QueryParams: make(url.Values)}
+```
+
+i.e. I start off with empty arrays and `url.Values`.  Then instead of logging out the path params when I have any, I can just append them to this empty array:
+
+```go
+resp.PathParams = append(resp.PathParams, splitPath...)
+```
+
+Next, I to encode `resp` as JSON, and I'll use the approach suggested [here](https://stackoverflow.com/a/37872799/990159) to avoid buffering the JSON in memory and just stream it back to the client:
+
+```go
+w.Header().Set("Content-Type", "application/json")
+w.WriteHeader(http.StatusOK)
+json.NewEncoder(w).Encode(resp)
+```
+
+### Checkpoint 4
+
+{{< code language="go" title="Checkpoint 4" id="code-checkpoint-4" expand="Show" collapse="Hide" isCollapsed="true" >}}
+{{% include "/days-of-go/day-1/checkpoint-4/main.go" %}}{{< /code >}}
+
+Running checkpoint 4 should now give:
+
+```sh
+curl http://localhost:8080/echo-params            
+{"pathParams":[],"queryParams":{}}
+
+curl http://localhost:8080/echo-params/
+{"pathParams":[],"queryParams":{}}
+
+curl http://localhost:8080/echo-params/hello      
+{"pathParams":["hello"],"queryParams":{}}
+
+curl http://localhost:8080/echo-params/hello/world
+{"pathParams":["hello","world"],"queryParams":{}}
+```
+
+All that's left are the query params, and that's as simple as:
+
+```go
+resp.QueryParams = r.URL.Query()
+```
+
+### Final version
+
+{{< code language="go" title="Final version" id="code-final-version" expand="Show" collapse="Hide" isCollapsed="true" >}}
+{{% include "/days-of-go/day-1/main.go" %}}{{< /code >}}
+
+```sh
+curl -s http://localhost:8080/echo-params/hello/world\?goodbye\=world,joking\&something\=else     
+{"pathParams":["hello","world"],"queryParams":{"goodbye":["world,joking"],"something":["else"]}}
+```
