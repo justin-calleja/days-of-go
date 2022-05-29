@@ -64,7 +64,7 @@ http.Handle("/echo-params", &fooHandler)
 ### Checkpoint 1
 
 {{< code language="go" title="Checkpoint 1" id="code-checkpoint-1" expand="Show" collapse="Hide"isCollapsed="true" >}}
-{{% include "/days-of-go/day-1/checkpoint-1/main.go" %}}{{< /code >}}
+{{% include "/series/days-of-go/day-1/checkpoint-1/main.go" %}}{{< /code >}}
 
 At this point, running the server with `go run checkpoint-1/main.go`, and hitting it with `curl http://localhost:8080/echo-params`, logs out `"hello"` preceded by the date / time.
 
@@ -105,7 +105,7 @@ curl http://localhost:8080/echo-params/hello/world
 ### Checkpoint 2
 
 {{< code language="go" title="Checkpoint 2" id="code-checkpoint-2" expand="Show" collapse="Hide" isCollapsed="true" >}}
-{{% include "/days-of-go/day-1/checkpoint-2/main.go" %}}{{< /code >}}
+{{% include "/series/days-of-go/day-1/checkpoint-2/main.go" %}}{{< /code >}}
 
 At this point, I tried using: `strings.Split(path, "/")`, but that was giving me an initial empty string e.g. `["","hello","world"]` because of the first `/` in the path. So I ended up going with `func FieldsFunc(s string, f func(rune) bool) []string ` instead. The function `f` takes a `rune`, which is just and `int32`:
 
@@ -130,7 +130,7 @@ splitPath := strings.FieldsFunc(path, f)
 You can run this new addition by running checkpoint 3:
 
 {{< code language="go" title="Checkpoint 3" id="code-checkpoint-3" expand="Show" collapse="Hide" isCollapsed="true" >}}
-{{% include "/days-of-go/day-1/checkpoint-3/main.go" %}}{{< /code >}}
+{{% include "/series/days-of-go/day-1/checkpoint-3/main.go" %}}{{< /code >}}
 
 Moving on. The response `struct` should look like this:
 
@@ -164,7 +164,7 @@ json.NewEncoder(w).Encode(resp)
 ### Checkpoint 4
 
 {{< code language="go" title="Checkpoint 4" id="code-checkpoint-4" expand="Show" collapse="Hide" isCollapsed="true" >}}
-{{% include "/days-of-go/day-1/checkpoint-4/main.go" %}}{{< /code >}}
+{{% include "/series/days-of-go/day-1/checkpoint-4/main.go" %}}{{< /code >}}
 
 Running checkpoint 4 should now give:
 
@@ -193,13 +193,13 @@ resp.QueryParams = r.URL.Query()
 After putting the echo params handler (that implements `http.Handler`) in it's own package in `eph/eph.go` so that it can be re-used elsewhere:
 
 {{< code language="txt" title="go.mod" nocollapse="true" collapse=" " isCollapsed="false" >}}
-{{% include "/days-of-go/day-1/go.mod" %}}{{< /code >}}
+{{% include "/series/days-of-go/day-1/go.mod" %}}{{< /code >}}
 
 {{< code language="go" title="main.go" nocollapse="true" collapse=" " isCollapsed="false" >}}
-{{% include "/days-of-go/day-1/main.go" %}}{{< /code >}}
+{{% include "/series/days-of-go/day-1/main.go" %}}{{< /code >}}
 
 {{< code language="go" title="eph/eph.go" nocollapse="true" collapse=" " isCollapsed="false" >}}
-{{% include "/days-of-go/day-1/eph/eph.go" %}}{{< /code >}}
+{{% include "/series/days-of-go/day-1/eph/eph.go" %}}{{< /code >}}
 
 ```sh
 curl -s http://localhost:8080/echo-params/hello/world\?goodbye\=world,joking\&something\=else
