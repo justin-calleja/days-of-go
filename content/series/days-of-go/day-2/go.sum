@@ -1,0 +1,4 @@
+github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=
+github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
+github.com/justin-calleja/days-of-go v0.0.0-20220528181746-2fdc271f46c1 h1:5YkjXkX/5R6LkkHjL/ow0mSjh1Rk5tf3VH97+xh9FtY=
+github.com/justin-calleja/days-of-go v0.0.0-20220528181746-2fdc271f46c1/go.mod h1:G56wJVk0sy8kIJU1O9VzbQBR92bAccByk912bKI5tGk=

@@ -1,8 +1,7 @@
-package main
+package eph
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -33,11 +32,4 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(resp)
-}
-
-func main() {
-	fooHandler := Handler{}
-	http.Handle("/echo-params", &fooHandler)
-	http.Handle("/echo-params/", &fooHandler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
 }

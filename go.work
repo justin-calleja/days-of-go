@@ -2,6 +2,6 @@ go 1.18
 
 use (
 	.
-	./content/days-of-go/day-1
-	./content/days-of-go/day-2
+	./content/series/days-of-go/day-1
+	./content/series/days-of-go/day-2
 )

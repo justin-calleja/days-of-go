@@ -2,6 +2,8 @@
 dateCreated:
 title: Day 1
 toc: true
+summary: >
+  Covers setting up an HTTP server with in-built go modules; getting access to query params and splitting path params; sending back data as JSON via `json.NewEncoder(w).Encode(resp)`.
 ---
 
 ## Goals
@@ -145,7 +147,7 @@ Which should probably be created at the top of the handler with:
 resp := response{PathParams: []string{}, QueryParams: make(url.Values)}
 ```
 
-i.e. I start off with empty arrays and `url.Values`.  Then instead of logging out the path params when I have any, I can just append them to this empty array:
+i.e. I start off with empty arrays and `url.Values`. Then instead of logging out the path params when I have any, I can just append them to this empty array:
 
 ```go
 resp.PathParams = append(resp.PathParams, splitPath...)
@@ -167,13 +169,13 @@ json.NewEncoder(w).Encode(resp)
 Running checkpoint 4 should now give:
 
 ```sh
-curl http://localhost:8080/echo-params            
+curl http://localhost:8080/echo-params
 {"pathParams":[],"queryParams":{}}
 
 curl http://localhost:8080/echo-params/
 {"pathParams":[],"queryParams":{}}
 
-curl http://localhost:8080/echo-params/hello      
+curl http://localhost:8080/echo-params/hello
 {"pathParams":["hello"],"queryParams":{}}
 
 curl http://localhost:8080/echo-params/hello/world
@@ -188,10 +190,18 @@ resp.QueryParams = r.URL.Query()
 
 ### Final version
 
-{{< code language="go" title="Final version" id="code-final-version" expand="Show" collapse="Hide" isCollapsed="true" >}}
+After putting the echo params handler (that implements `http.Handler`) in it's own package in `eph/eph.go` so that it can be re-used elsewhere:
+
+{{< code language="txt" title="go.mod" nocollapse="true" collapse=" " isCollapsed="false" >}}
+{{% include "/days-of-go/day-1/go.mod" %}}{{< /code >}}
+
+{{< code language="go" title="main.go" nocollapse="true" collapse=" " isCollapsed="false" >}}
 {{% include "/days-of-go/day-1/main.go" %}}{{< /code >}}
 
+{{< code language="go" title="eph/eph.go" nocollapse="true" collapse=" " isCollapsed="false" >}}
+{{% include "/days-of-go/day-1/eph/eph.go" %}}{{< /code >}}
+
 ```sh
-curl -s http://localhost:8080/echo-params/hello/world\?goodbye\=world,joking\&something\=else     
+curl -s http://localhost:8080/echo-params/hello/world\?goodbye\=world,joking\&something\=else
 {"pathParams":["hello","world"],"queryParams":{"goodbye":["world,joking"],"something":["else"]}}
 ```
