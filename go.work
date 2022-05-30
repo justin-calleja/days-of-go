@@ -4,4 +4,5 @@ use (
 	.
 	./content/series/days-of-go/day-1
 	./content/series/days-of-go/day-2
+	./content/series/days-of-go/day-2/checkpoint-1
 )

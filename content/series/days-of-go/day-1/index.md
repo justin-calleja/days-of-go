@@ -1,5 +1,4 @@
 ---
-dateCreated:
 title: Day 1
 toc: true
 summary: >
