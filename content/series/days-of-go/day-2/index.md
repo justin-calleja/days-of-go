@@ -44,7 +44,7 @@ $ go run github.com/justin-calleja/days-of-go/day-2/checkpoint-1 | jq
 
 This is basically using the `eph.Response` defined in [day 1](../day-1) and streaming it to `os.Stdout`.
 
-### [github.com/gorilla/mux](https://github.com/gorilla/mux)
+### github.com/gorilla/mux
 
 Add [github.com/gorilla/mux](https://github.com/gorilla/mux) with `go get -u github.com/gorilla/mux`, and create a new router and a sub router:
 

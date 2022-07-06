@@ -2,7 +2,7 @@
 title: Day 1
 toc: true
 summary: >
-  Covers setting up an HTTP server with in-built go modules; getting access to query params and splitting path params; sending back data as JSON via `json.NewEncoder(w).Encode(resp)`.
+  Set up an HTTP server with in-built go modules. Get access to query params and split path params. Send back data as JSON via `json.NewEncoder(w).Encode(resp)`.
 ---
 
 ## Goals
@@ -62,7 +62,7 @@ http.Handle("/echo-params", &fooHandler)
 
 ### Checkpoint 1
 
-{{< code language="go" title="Checkpoint 1" id="code-checkpoint-1" expand="Show" collapse="Hide"isCollapsed="true" >}}
+{{< code language="go" title="Checkpoint 1" id="code-checkpoint-1" expand="Show" collapse="Hide" isCollapsed="true" >}}
 {{% include "/series/days-of-go/day-1/checkpoint-1/main.go" %}}{{< /code >}}
 
 At this point, running the server with `go run checkpoint-1/main.go`, and hitting it with `curl http://localhost:8080/echo-params`, logs out `"hello"` preceded by the date / time.
@@ -204,3 +204,16 @@ After putting the echo params handler (that implements `http.Handler`) in it's o
 curl -s http://localhost:8080/echo-params/hello/world\?goodbye\=world,joking\&something\=else
 {"pathParams":["hello","world"],"queryParams":{"goodbye":["world,joking"],"something":["else"]}}
 ```
+
+## Edit 1
+
+By using `http.Handle`, the code in this entry has been using the global `DefaultServeMux` in the [net/http](https://pkg.go.dev/net/http) package. It's ok for throw-away examples like the ones listed here but it's preferable to create your own, locally-scoped, servemux. E.g.:
+
+```go
+mux := http.NewServeMux()
+mux.Handle("/echo-params", &echoParamsHandler)
+```
+
+> Because `DefaultServeMux` is a global variable, any package can access it and register a route — including any third-party packages that your application imports. If one of those third-party packages is compromised, they could use `DefaultServeMux` to expose a malicious handler to the web.
+>
+> From chapter 1 of [Learn to Build Professional Web Applications with Go](https://lets-go.alexedwards.net/) by [Alex Edwards](https://www.alexedwards.net/) (publiccly available as sample chapter).

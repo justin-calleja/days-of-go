@@ -1,5 +1,6 @@
 ---
 title: Days of Go
+type: days-of-go
 ---
 
 This is a series of posts about me practicing / learning the [Go](https://go.dev/) programming language. Each "day" was not necessarily written in a day and the topics covered are ad-hoc based on what I feel I'd like to cover at any particular point in time.
